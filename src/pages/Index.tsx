@@ -412,6 +412,7 @@ const Index = () => {
                   </div>
                 </Card>
               </div>
+              </div>
             ) : (
               <div className="max-w-md mx-auto text-center py-12">
                 <div className="text-6xl mb-4">🔐</div>
