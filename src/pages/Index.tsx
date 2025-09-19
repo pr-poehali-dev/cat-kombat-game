@@ -383,22 +383,23 @@ const Index = () => {
                   <div className="text-center space-y-4">
                     <div className="text-6xl mb-4">🐱</div>
                     <h3 className="text-xl font-semibold text-orange-700">Кот-Боец</h3>
-                  <div className="grid grid-cols-2 gap-4 mt-6">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-600">{gameState.level}</div>
-                      <div className="text-sm text-orange-500">Уровень</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-600">{formatNumber(gameState.totalClicks)}</div>
-                      <div className="text-sm text-orange-500">Всего кликов</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-600">{gameState.clickPower}</div>
-                      <div className="text-sm text-orange-500">Сила клика</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-orange-600">{formatNumber(gameState.coins)}</div>
-                      <div className="text-sm text-orange-500">Монеты</div>
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-600">{gameState.level}</div>
+                        <div className="text-sm text-orange-500">Уровень</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-600">{formatNumber(gameState.totalClicks)}</div>
+                        <div className="text-sm text-orange-500">Всего кликов</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-600">{gameState.clickPower}</div>
+                        <div className="text-sm text-orange-500">Сила клика</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-orange-600">{formatNumber(gameState.coins)}</div>
+                        <div className="text-sm text-orange-500">Монеты</div>
+                      </div>
                     </div>
                     <div className="mt-6">
                       <Button 
