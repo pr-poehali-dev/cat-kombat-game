@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 
 interface GameState {
@@ -42,6 +45,11 @@ const Index = () => {
 
   const [clickAnimations, setClickAnimations] = useState<Array<{id: number, x: number, y: number}>>([]);
   const [activeTab, setActiveTab] = useState('home');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const shopItems: ShopItem[] = [
     { id: 1, name: 'Острые когти', description: 'Увеличивает силу когтей на +1 клик', price: 15, clickBoost: 1, owned: 0 },
@@ -168,6 +176,24 @@ const Index = () => {
     const minutes = Math.floor((timeInMs % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeInMs % (1000 * 60)) / 1000);
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleAuth = () => {
+    // Простая проверка (в реальном проекте здесь был бы запрос к серверу)
+    if (username.trim() && password.trim()) {
+      setIsLoggedIn(true);
+      setShowAuth(false);
+      setUsername('');
+      setPassword('');
+    }
+  };
+
+  const handleProfileClick = () => {
+    if (isLoggedIn) {
+      setActiveTab('profile');
+    } else {
+      setShowAuth(true);
+    }
   };
 
   return (
@@ -350,12 +376,13 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="profile" className="h-full m-0 p-4">
-            <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-orange-600 mb-6 text-center">👤 Профиль игрока</h2>
-              <Card className="p-6">
-                <div className="text-center space-y-4">
-                  <div className="text-6xl mb-4">🐱</div>
-                  <h3 className="text-xl font-semibold text-orange-700">Кот-Боец</h3>
+            {isLoggedIn ? (
+              <div className="max-w-2xl mx-auto">
+                <h2 className="text-2xl font-bold text-orange-600 mb-6 text-center">👤 Профиль игрока</h2>
+                <Card className="p-6">
+                  <div className="text-center space-y-4">
+                    <div className="text-6xl mb-4">🐱</div>
+                    <h3 className="text-xl font-semibold text-orange-700">Кот-Боец</h3>
                   <div className="grid grid-cols-2 gap-4 mt-6">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-orange-600">{gameState.level}</div>
@@ -373,10 +400,33 @@ const Index = () => {
                       <div className="text-2xl font-bold text-orange-600">{formatNumber(gameState.coins)}</div>
                       <div className="text-sm text-orange-500">Монеты</div>
                     </div>
+                    <div className="mt-6">
+                      <Button 
+                        onClick={() => setIsLoggedIn(false)} 
+                        variant="outline" 
+                        className="text-red-600 border-red-600 hover:bg-red-50"
+                      >
+                        Выйти
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            </div>
+                </Card>
+              </div>
+            ) : (
+              <div className="max-w-md mx-auto text-center py-12">
+                <div className="text-6xl mb-4">🔐</div>
+                <h2 className="text-2xl font-bold text-orange-600 mb-4">Требуется авторизация</h2>
+                <p className="text-orange-500 mb-6">
+                  Войдите в свой аккаунт, чтобы просматривать профиль и сохранять прогресс
+                </p>
+                <Button 
+                  onClick={() => setShowAuth(true)}
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  Войти или зарегистрироваться
+                </Button>
+              </div>
+            )}
           </TabsContent>
         </div>
 
@@ -394,12 +444,66 @@ const Index = () => {
             <Icon name="Trophy" size={20} />
             <span className="text-xs">Достижения</span>
           </TabsTrigger>
-          <TabsTrigger value="profile" className="flex flex-col gap-1 h-full data-[state=active]:bg-orange-100">
+          <TabsTrigger 
+            value="profile" 
+            className="flex flex-col gap-1 h-full data-[state=active]:bg-orange-100"
+            onClick={handleProfileClick}
+          >
             <Icon name="User" size={20} />
-            <span className="text-xs">Профиль</span>
+            <span className="text-xs">{isLoggedIn ? 'Профиль' : 'Войти'}</span>
           </TabsTrigger>
         </TabsList>
       </Tabs>
+
+      {/* Диалог авторизации */}
+      <Dialog open={showAuth} onOpenChange={setShowAuth}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-orange-600">
+              {authMode === 'login' ? '🔑 Вход в игру' : '📝 Регистрация'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Логин</Label>
+              <Input
+                id="username"
+                placeholder="Введите логин"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Пароль</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Введите пароль"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="space-y-3">
+              <Button 
+                onClick={handleAuth} 
+                className="w-full bg-orange-500 hover:bg-orange-600"
+                disabled={!username.trim() || !password.trim()}
+              >
+                {authMode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+              </Button>
+              <div className="text-center">
+                <Button
+                  variant="link"
+                  onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+                  className="text-orange-600"
+                >
+                  {authMode === 'login' ? 'Нет аккаунта? Регистрация' : 'Есть аккаунт? Войти'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
