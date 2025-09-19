@@ -13,6 +13,9 @@ interface GameState {
   level: number;
   experience: number;
   autoClickers: number;
+  energy: number;
+  maxEnergy: number;
+  energyRegenTime: number | null;
 }
 
 interface ShopItem {
@@ -31,7 +34,10 @@ const Index = () => {
     totalClicks: 0,
     level: 1,
     experience: 0,
-    autoClickers: 0
+    autoClickers: 0,
+    energy: 100,
+    maxEnergy: 100,
+    energyRegenTime: null
   });
 
   const [clickAnimations, setClickAnimations] = useState<Array<{id: number, x: number, y: number}>>([]);
@@ -66,6 +72,30 @@ const Index = () => {
     }
   }, [gameState.autoClickers]);
 
+  // Система регенерации энергии
+  useEffect(() => {
+    if (gameState.energyRegenTime) {
+      const interval = setInterval(() => {
+        setGameState(prev => {
+          const now = Date.now();
+          const timeLeft = prev.energyRegenTime! - now;
+          
+          if (timeLeft <= 0) {
+            return {
+              ...prev,
+              energy: prev.maxEnergy,
+              energyRegenTime: null
+            };
+          }
+          
+          return prev;
+        });
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [gameState.energyRegenTime]);
+
   // Уборка анимаций
   useEffect(() => {
     clickAnimations.forEach(animation => {
@@ -76,6 +106,9 @@ const Index = () => {
   }, [clickAnimations]);
 
   const handleCatClick = (event: React.MouseEvent) => {
+    // Проверяем, есть ли энергия
+    if (gameState.energy <= 0) return;
+    
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -93,13 +126,22 @@ const Index = () => {
       const newClicks = prev.totalClicks + 1;
       const newExp = prev.experience + 1;
       const expForNext = prev.level * 100;
+      const newEnergy = prev.energy - 1;
+      
+      // Если энергия закончилась, запускаем 3-часовой таймер
+      let energyRegenTime = prev.energyRegenTime;
+      if (newEnergy === 0 && !prev.energyRegenTime) {
+        energyRegenTime = Date.now() + (3 * 60 * 60 * 1000); // 3 часа
+      }
       
       return {
         ...prev,
         coins: newCoins,
         totalClicks: newClicks,
         experience: newExp >= expForNext ? newExp - expForNext : newExp,
-        level: newExp >= expForNext ? prev.level + 1 : prev.level
+        level: newExp >= expForNext ? prev.level + 1 : prev.level,
+        energy: newEnergy,
+        energyRegenTime
       };
     });
   };
@@ -119,6 +161,13 @@ const Index = () => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
+  };
+
+  const formatTime = (timeInMs: number) => {
+    const hours = Math.floor(timeInMs / (1000 * 60 * 60));
+    const minutes = Math.floor((timeInMs % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeInMs % (1000 * 60)) / 1000);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -146,8 +195,28 @@ const Index = () => {
                   </div>
                 </div>
                 
-                {/* Прогресс-бар опыта */}
+                {/* Прогресс-бар энергии */}
                 <div className="mt-3">
+                  <div className="flex justify-between text-xs text-orange-600 mb-1">
+                    <span>⚡ Энергия</span>
+                    <span>
+                      {gameState.energyRegenTime ? (
+                        <span className="text-red-500">
+                          Восстановление: {formatTime(gameState.energyRegenTime - Date.now())}
+                        </span>
+                      ) : (
+                        `${gameState.energy}/${gameState.maxEnergy}`
+                      )}
+                    </span>
+                  </div>
+                  <Progress 
+                    value={(gameState.energy / gameState.maxEnergy) * 100} 
+                    className={`h-3 ${gameState.energy === 0 ? 'bg-red-100' : 'bg-blue-100'}`}
+                  />
+                </div>
+                
+                {/* Прогресс-бар опыта */}
+                <div className="mt-2">
                   <div className="flex justify-between text-xs text-orange-600 mb-1">
                     <span>Опыт</span>
                     <span>{gameState.experience}/{gameState.level * 100}</span>
