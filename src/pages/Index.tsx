@@ -163,7 +163,11 @@ const Index = () => {
               <div className="flex-1 flex items-center justify-center relative overflow-hidden">
                 <div className="relative">
                   <div 
-                    className="relative cursor-pointer select-none transition-transform duration-200 hover:scale-105 animate-pulse-glow"
+                    className="relative cursor-pointer select-none transition-transform duration-200 hover:scale-105 animate-pulse-glow p-8 rounded-3xl bg-gradient-to-br from-orange-100 via-yellow-50 to-pink-100 border-4 border-gradient-to-r from-orange-300 to-pink-300 shadow-2xl backdrop-blur-sm"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,154,0,0.1) 0%, rgba(255,193,7,0.1) 50%, rgba(255,64,129,0.1) 100%)',
+                      borderImage: 'linear-gradient(45deg, #FF6B35, #FFD23F, #FF4081) 1'
+                    }}
                     onClick={handleCatClick}
                   >
                     <img 
