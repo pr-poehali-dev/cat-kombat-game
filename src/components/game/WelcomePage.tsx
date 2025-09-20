@@ -41,7 +41,7 @@ const WelcomePage = ({ onStartGame, onShowAuth }: WelcomePageProps) => {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-2 border-white/30 text-white hover:bg-white/10 font-bold px-8 py-4 text-lg rounded-full backdrop-blur-sm"
+              className="border-2 border-orange-500 text-orange-500 bg-white hover:bg-orange-50 font-bold px-8 py-4 text-lg rounded-full"
               onClick={onShowAuth}
             >
               👤 ВОЙТИ / РЕГИСТРАЦИЯ
