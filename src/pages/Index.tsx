@@ -22,7 +22,10 @@ const Index = () => {
     formatTime
   } = useGameLogic();
 
-  const [activeTab, setActiveTab] = useState('welcome');
+  const [activeTab, setActiveTab] = useState(() => {
+    const isAuth = localStorage.getItem('catKombatAuth') === 'true';
+    return isAuth ? (localStorage.getItem('catKombatTab') || 'home') : 'welcome';
+  });
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('catKombatAuth') === 'true';
   });
@@ -36,8 +39,15 @@ const Index = () => {
       localStorage.setItem('catKombatAuth', 'true');
     } else {
       localStorage.removeItem('catKombatAuth');
+      localStorage.removeItem('catKombatTab');
     }
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (isLoggedIn && activeTab !== 'welcome') {
+      localStorage.setItem('catKombatTab', activeTab);
+    }
+  }, [activeTab, isLoggedIn]);
 
   const handleAuth = () => {
     if (username.trim() && password.trim()) {
