@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { useGameLogic } from '@/hooks/useGameLogic';
@@ -23,11 +23,21 @@ const Index = () => {
   } = useGameLogic();
 
   const [activeTab, setActiveTab] = useState('welcome');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('catKombatAuth') === 'true';
+  });
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      localStorage.setItem('catKombatAuth', 'true');
+    } else {
+      localStorage.removeItem('catKombatAuth');
+    }
+  }, [isLoggedIn]);
 
   const handleAuth = () => {
     if (username.trim() && password.trim()) {
