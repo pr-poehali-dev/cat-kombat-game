@@ -72,7 +72,7 @@ const Index = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-screen flex flex-col">
         
         {/* Главная страница с описанием игры */}
-        <TabsContent value="welcome" className="h-full m-0 flex flex-col">
+        <TabsContent value="welcome" className="h-full m-0">
           <WelcomePage onStartGame={startGame} onShowAuth={handleShowAuth} />
         </TabsContent>
 
